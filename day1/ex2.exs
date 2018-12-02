@@ -4,7 +4,8 @@ defmodule AdventOfCode.Day1.Part2 do
   """
 
   @doc """
-  Processes Stream of frequency changes and sums them up.
+  Processes a stream of frequency changes but stops when it 
+  finds the first frequency that repeats twice.
   """
   @spec first_repeated_twice(Enumerable.t()) :: integer
   def first_repeated_twice(stream) do
@@ -26,7 +27,6 @@ defmodule AdventOfCode.Day1.Part2 do
       stream
       |> first_repeated_twice()
 
-    IO.puts("Solution: #{result}")
     result
   end
 
@@ -47,7 +47,10 @@ filename =
     [file] -> file
   end
 
-filename
-|> File.stream!()
-|> Stream.cycle()
-|> AdventOfCode.Day1.Part2.get_solution()
+result =
+  filename
+  |> File.stream!()
+  |> Stream.cycle()
+  |> AdventOfCode.Day1.Part2.get_solution()
+
+IO.puts("Solution: #{result}")
