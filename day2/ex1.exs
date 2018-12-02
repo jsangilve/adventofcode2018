@@ -26,22 +26,17 @@ defmodule AdventOfCode.Day2.Part1 do
     {num_repetitions(ocurrences, 2), num_repetitions(ocurrences, 3)}
   end
 
-  defp num_repetitions(ocurrences, num) do
+  @doc """
+  Returns 1 when any letter has `num` of ocurrences. Otherwise returns 0.
+  """
+  @spec num_repetitions(list(), integer) :: integer
+  def num_repetitions(ocurrences, num) do
     if Enum.any?(ocurrences, fn {_, val} -> val == num end) do
       1
     else
       0
     end
   end
-
-  #  @doc """
-  #  Builds a list that only contains the letters which ocurrence is 2 or 3.
-  #  """
-  #  @spec filter_by_ocurrence(integer()) :: list
-  #  def filter_by_ocurrences(ocurrences) do
-  #    ocurrences
-  #    |> Enum.filter(fn {_key, val} -> val == 2 or val == 3} end)
-  #  end
 
   @spec get_solution(Enumerable.t()) :: integer()
   def get_solution(stream) do
@@ -50,7 +45,6 @@ defmodule AdventOfCode.Day2.Part1 do
       stream
       |> count_repeated()
 
-    IO.inspect(result)
     twice * triple
   end
 end
