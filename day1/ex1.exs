@@ -28,8 +28,7 @@ end
 
 
 result = filename
-|> File.read!()
-|> String.split("\n")
+|> File.stream!()
 |> AdventOfCode.Day1.add_frequency_changes()
 
 IO.puts ("Solution: #{result}")
