@@ -41,7 +41,6 @@ defmodule AdventOfCode.Day2.Part1 do
   @spec get_solution(Enumerable.t()) :: integer()
   def get_solution(stream) do
     {twice, triple} =
-      result =
       stream
       |> count_repeated()
 
@@ -58,7 +57,7 @@ filename =
 result =
   filename
   |> File.stream!([], :line)
-  |> Stream.map(&String.graphemes/1)
+  |> Stream.map(&String.codepoints/1)
   |> AdventOfCode.Day2.Part1.get_solution()
 
 IO.puts("Solution: #{result}")
