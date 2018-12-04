@@ -41,7 +41,7 @@ defmodule AdventOfCode.Day2.Part2 do
     end)
   end
 
-  @spec get_solution(Enumerable.t()) :: integer()
+  @spec get_solution(Enumerable.t()) :: binary()
   def get_solution(stream) do
     {_box1, _box2, myers_diff} =
       stream
