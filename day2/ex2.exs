@@ -25,18 +25,19 @@ defmodule AdventOfCode.Day2.Part2 do
 
   @spec check_myers_difference(binary, list(binary())) :: tuple() | nil
   def check_myers_difference(box, rest) do
-    # using a Enum.reduce_while instead of Enum.find to avoid calculating the myers 
-    # between the boxes twice
     rest
-    |> Enum.reduce_while(nil, fn current_box, _acc ->
+    |> Enum.find_value(fn current_box -> 
       myers_diff = String.myers_difference(box, current_box)
       diff = Keyword.get_values(myers_diff, :del)
-
-      # box matches if they have only one :del element and its length is 1
+      # boxes match if they have only one :del element and its length is 1
+      # I thought about matching myers_diff length to 4: 
+      # myers_diff = [eq: "foo", del: "bar", ins: "bah", eq: "blah"].
+      # but that would fail if the differences between the boxes is either
+      # on the first or last character.
       if length(diff) == 1 and String.length(List.first(diff)) == 1 do
-        {:halt, {box, current_box, myers_diff}}
+        {box, current_box, myers_diff}
       else
-        {:cont, nil}
+        nil
       end
     end)
   end
