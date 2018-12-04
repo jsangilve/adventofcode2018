@@ -6,42 +6,51 @@ defmodule AdventOfCode.Day2.Part2 do
   @doc """
   Finds boxes which have all characters in common but one.
   """
+  @spec find_boxes(list(binary()), tuple | nil) :: tuple()
+  def find_boxes(boxes, result \\ nil)
+
   def find_boxes([], result), do: result
 
   def find_boxes([first_box | rest], _result) do
-    case check_myers_difference(first_box, rest) do
-      box when is_binary(box) ->
-        {first_box, box}
+    result = check_myers_difference(first_box, rest)
+
+    case result do
+      nil ->
+        find_boxes(rest, nil)
 
       _ ->
-        find_boxes(rest, nil)
+        result
     end
   end
 
+  @spec check_myers_difference(binary, list(binary())) :: tuple() | nil
   def check_myers_difference(box, rest) do
-    Enum.find(rest, fn current_box ->
+    # using a Enum.reduce_while instead of Enum.find to avoid calculating the myers 
+    # between the boxes twice
+    rest
+    |> Enum.reduce_while(nil, fn current_box, _acc ->
       myers_diff = String.myers_difference(box, current_box)
-      count_del = Enum.count(myers_diff, fn {key, _} -> key == :del end)
-      count_eq = Enum.count(myers_diff, fn {key, _} -> key == :eq end)
+      diff = Keyword.get_values(myers_diff, :del)
 
-      count_del == 1 and count_eq > 1 and
-        String.length(Keyword.get(myers_diff, :del, 0)) == 1
+      # box matches if they have only one :del element and its length is 1
+      if length(diff) == 1 and String.length(List.first(diff)) == 1 do
+        {:halt, {box, current_box, myers_diff}}
+      else
+        {:cont, nil}
+      end
     end)
   end
 
   @spec get_solution(Enumerable.t()) :: integer()
   def get_solution(stream) do
-    {box1, box2} =
+    {_box1, _box2, myers_diff} =
       stream
       |> Enum.to_list()
-      |> find_boxes(nil)
+      |> find_boxes()
 
-    IO.inspect({box1, box2})
-
-    r =
-      String.myers_difference(box1, box2)
-      |> Keyword.get_values(:eq)
-      |> Enum.join()
+    myers_diff
+    |> Keyword.get_values(:eq)
+    |> Enum.join()
   end
 end
 
