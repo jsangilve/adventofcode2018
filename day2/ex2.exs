@@ -26,7 +26,7 @@ defmodule AdventOfCode.Day2.Part2 do
   @spec check_myers_difference(binary, list(binary())) :: tuple() | nil
   def check_myers_difference(box, rest) do
     rest
-    |> Enum.find_value(fn current_box -> 
+    |> Enum.find_value(fn current_box ->
       myers_diff = String.myers_difference(box, current_box)
       diff = Keyword.get_values(myers_diff, :del)
       # boxes match if they have only one :del element and its length is 1
