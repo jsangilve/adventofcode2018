@@ -10,14 +10,13 @@ defmodule AdventOfCode.Day3.Part2 do
   def find_intact_claim(stream) do
     stream
     |> Enum.reduce(%{intact: MapSet.new()}, fn %{
-                                                  "id" => id,
-                                                  "x" => x,
-                                                  "y" => y,
-                                                  "width" => w,
-                                                  "height" => h
-                                                },
-                                                acc ->
-
+                                                 "id" => id,
+                                                 "x" => x,
+                                                 "y" => y,
+                                                 "width" => w,
+                                                 "height" => h
+                                               },
+                                               acc ->
       acc = Map.update!(acc, :intact, &MapSet.put(&1, id))
 
       {acc, MapSet.new()}
@@ -25,50 +24,48 @@ defmodule AdventOfCode.Day3.Part2 do
     end)
     |> Map.get(:intact)
     |> Enum.to_list()
-    |> List.first
+    |> List.first()
   end
 
   @doc """
   Adds claim to the fabric.
   """
-  def record_claim({fabric, to_drop}, _, _, _, _, 0) do
+  def record_claim({fabric, overlapped}, _, _, _, _, 0) do
     fabric
     |> Map.update!(:intact, fn set ->
-      to_drop
-      |> Enum.reduce(set, &MapSet.delete(&2, &1))
+      Enum.reduce(overlapped, set, &MapSet.delete(&2, &1))
     end)
   end
 
-  def record_claim(acc, id, left, top, w, h) do
-    Range.new(0, w - 1)
-    |> Enum.reduce(acc, fn x, {fabric, to_drop} ->
-      key = "#{left + x},#{top + h - 1}"
-      inch = Map.get(fabric, key)
-      fabric = update_inch(fabric, key, id)
+  def record_claim({fabric, overlapped}, id, left, top, w, h) do
+    {new_fabric, to_drop} =
+      Range.new(0, w - 1)
+      |> Enum.reduce({fabric, MapSet.new()}, fn x, {fabric, to_drop} ->
+        key = "#{left + x},#{top + h - 1}"
+        inch = Map.get(fabric, key)
+        fabric = update_square_inch(fabric, key, id)
 
-      case inch do
-        nil ->
-          {fabric, to_drop}
+        case inch do
+          nil ->
+            {fabric, to_drop}
 
-        {_, ids} ->
-          {fabric, Enum.into([id | ids], to_drop, & &1)}
-      end
-    end)
+          ids ->
+            {fabric, Enum.into([id | ids], to_drop, & &1)}
+        end
+      end)
+
+    {new_fabric, MapSet.union(overlapped, to_drop)}
     |> record_claim(id, left, top, w, h - 1)
   end
 
-  def update_inch(acc, key, id) do
-    acc
-    |> Map.update(key, {1, [id]}, fn {count, ids} ->
-      {count + 1, [id | ids]}
-    end)
-  end
+  @spec update_square_inch(map(), binary(), binary()) :: map()
+  def update_square_inch(acc, key, id),
+    do: Map.update(acc, key, [id], &[id | &1])
 
   @spec get_solution(Enumerable.t()) :: integer()
-  def get_solution(stream) do
-    stream
-    |> find_intact_claim()
-  end
+  def get_solution(stream),
+    do: find_intact_claim(stream)
+
 end
 
 filename =
