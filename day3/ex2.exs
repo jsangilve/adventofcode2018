@@ -29,6 +29,8 @@ defmodule AdventOfCode.Day3.Part2 do
 
   @doc """
   Adds claim to the fabric.
+
+  WARNING: Using recursion here makes this quite slow
   """
   def record_claim({fabric, overlapped}, _, _, _, _, 0) do
     fabric
