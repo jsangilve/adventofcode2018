@@ -46,43 +46,10 @@ defmodule Day5 do
     |> to_charlist()
   end
 
-  @spec sol_part1(String.t()) :: integer()
-  def sol_part1(filename) do
-    filename
-    |> read_file()
-    |> react()
-    |> count_units()
-  end
-
-  def ascii_chars(), do: Enum.to_list(?a..?z)
-
   @spec remove_unit(charlist(), codepoint) :: charlist()
   def remove_unit(polymer, unit) do
     polymer
     |> Enum.reject(&same_unit?(&1, unit))
-  end
-
-  @spec sol_part2_concurrent(String.t()) :: integer()
-  def sol_part2_concurrent(filename) do
-    polymer = read_file(filename)
-
-    ascii_chars()
-    |> Enum.map(fn unit ->
-      Task.async(fn -> remove_and_react(polymer, unit) end)
-    end)
-    |> Enum.map(& Task.await(&1))
-    |> Enum.sort_by(fn {_, count} -> count end)
-    |> List.first
-  end
-
-  @spec sol_part2(String.t()) :: integer()
-  def sol_part2(filename) do
-    polymer = read_file(filename)
-
-    ascii_chars()
-    |> Enum.map(&remove_and_react(polymer, &1))
-    |> Enum.sort_by(fn {_, count} -> count end)
-    |> List.first
   end
 
   @spec remove_and_react(charlist, codepoint) :: {:ok, codepoint, integer}
@@ -100,4 +67,34 @@ defmodule Day5 do
   """
   @spec same_unit?(codepoint, codepoint) :: boolean()
   def same_unit?(a, b), do: a == b or abs(a - b) == 32
+
+  @spec sol_part1(String.t()) :: integer()
+  def sol_part1(filename) do
+    filename
+    |> read_file()
+    |> react()
+    |> count_units()
+  end
+
+  @spec sol_part2(String.t()) :: integer()
+  def sol_part2(filename) do
+    polymer = read_file(filename)
+
+    ?a..?z
+    |> Enum.map(&remove_and_react(polymer, &1))
+    |> Enum.min_by(fn {_, count} -> count end)
+  end
+
+  @spec sol_part2_concurrent(String.t()) :: integer()
+  def sol_part2_concurrent(filename) do
+    polymer = read_file(filename)
+
+    ?a..?z
+    |> Enum.map(fn unit ->
+      Task.async(fn -> remove_and_react(polymer, unit) end)
+    end)
+    |> Enum.map(& Task.await(&1))
+    |> Enum.min_by(fn {_, count} -> count end)
+  end
+
 end
